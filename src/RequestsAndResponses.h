@@ -99,7 +99,7 @@ namespace ContentType
  *
  * This namespace includes constants for various HTTP status codes, organized
  * into different categories based on their purpose and meaning.
- * 
+ *
  * The status codes listed here are defined by RFC 9110: https://httpwg.org/specs/rfc9110.html#overview.of.status.codes
  */
 namespace StatusCode
@@ -443,6 +443,14 @@ private:
     bool _haParametros;
 };
 
+/**
+ * @class BuildResponse
+ * @brief A class to build and send HTTP responses.
+ *
+ * This class provides methods to construct and send HTTP responses to a client.
+ * It allows setting the response code, adding headers, and sending the response
+ * message with optional content type and length.
+ */
 class BuildResponse
 {
 public:
