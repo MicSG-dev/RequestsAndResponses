@@ -3,8 +3,7 @@
 AnalyserRequest::AnalyserRequest()
 {
     _contentLength = 0;
-    _haParametros = false;
-    _contentType[0] = ' ';
+    _haParametros = false;    
     _numHeadersCustom = 0;
     _metodo = MetodosHttp::UNKNOWN;
 }
@@ -96,7 +95,11 @@ Header AnalyserRequest::analisarLinhaHttp(const char *linha)
         headerCustom.valor = strtok(NULL, ": ");
         return headerCustom;
     }
-    return Header();
+    Header headerEmpty;
+    headerEmpty.chave = NULL;
+    headerEmpty.valor = NULL;
+
+    return headerEmpty;
 }
 
 const char *AnalyserRequest::getUrl()
