@@ -1,6 +1,6 @@
 # RequestsAndResponses Library
 
-Welcome to the **RequestsAndResponses** library for the EthernetESP32 OTA project. This library is designed to simplify handling HTTP requests and responses for your ESP32 projects.
+Welcome to the **RequestsAndResponses** library for the Arduino projects. This library is designed to simplify handling HTTP requests and responses for your ESP32 projects.
 
 ## Features
 
