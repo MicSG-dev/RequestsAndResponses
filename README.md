@@ -121,7 +121,7 @@ Note that you can change these default values ​​to suit your needs by modify
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/yourusername/RequestsAndResponses/blob/main/LICENSE) file for more details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/MicSG-dev/RequestsAndResponses/blob/main/LICENSE) file for more details.
 
 ## Contact
 
