@@ -117,7 +117,7 @@ User-Agent   | 128     |
 Authorization| 128     |
 Cookie       | 512     |
 
-Note that you can change these default values ​​to suit your needs by modifying the `RequestsAndResponses.h` file.
+Note that you can change these default values ​​to suit your needs by modifying the [`RequestsAndResponses.h`](https://github.com/MicSG-dev/RequestsAndResponses/blob/86c00fa5a755a7af7c25987d90a2f1600e2f19f3/src/RequestsAndResponses.h#L431-L440) file.
 
 ## License
 
