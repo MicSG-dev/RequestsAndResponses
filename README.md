@@ -30,198 +30,94 @@ To install the RequestsAndResponses library in your PlatformIO project, follow t
 Here is a simple example to get you started with Ethernet:
 
 ```cpp
-#include <Arduino.h>
-#include <SPI.h>
-#include <Ethernet.h>
-#include <RequestsAndResponses.h>
-
-// Enter a MAC address and IP address for your controller below.
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 1, 177);
-
-void setup() {
-    Serial.begin(115200);
-    // Initialize the Ethernet client library
-    Ethernet.begin(mac, ip);
-    // Check for Ethernet hardware present
-    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-        Serial.println("Ethernet shield was not found. Sorry, can't run without hardware. :(");
-        while (true) {
-            delay(1); // do nothing, no point running without Ethernet hardware
-        }
-    }
-    // Check for Ethernet connection
-    if (Ethernet.linkStatus() == LinkOFF) {
-        Serial.println("Ethernet cable is not connected.");
-    }
-
-    server.begin();
+// ...
+// ...
+// ...
+// ...
+// ...
+                    
+Serial.print("Is the method 'POST'? ");
+if(request.metodoIs(MetodosHttp::POST)){
+    Serial.println("yes");
+}else{
+    Serial.println("no");
 }
 
-void loop() {
-    EthernetClient client = server.available();
-    if (client)
-    {
-        char currentLine[512] = "";  // Linha atual da requisição
-        size_t currentLineIndex = 0; // Índice da linha atual
+Serial.print("So know that the current method is: ");
+Serial.println(request.getMetodo());
 
-        AnalyserRequest request;
-
-        char myHeader[50]; // tamanho necessário customizavel
-
-        while (client.connected())
-        {
-            if (client.available())
-            {
-                char c = client.read();
-                Serial.write(c);
-
-                // Detecta o fim do cabeçalho HTTP (linha vazia)
-                if (c == '\n' && currentLineIndex == 0)
-                {
-                    if (request.metodoIs(MetodosHttp::GET))
-                    {
-                        Serial.println("metodo GET");
-                        Serial.print("URL: ");
-                        Serial.println(request.getUrl());
-                        Serial.print("Content-Length: ");
-                        Serial.println(request.getContentLength());
-                        Serial.print("Content-Type: ");
-                        Serial.println(request.getContentType());
-
-                        // Verifica se a URL é a /teste
-                        if (request.urlIs("/teste"))
-                        {
-                            Serial.println("URL /teste detectada");
-                            client.println("HTTP/1.1 200 OK");
-                            client.println("Content-Type: text/plain");
-                            client.println("Connection: close");
-                            client.println();
-                            client.println("URL /teste detectada");
-
-                            Serial.print("Parametros: ");
-                            Serial.println(request.getParams());
-
-                            if (request.paramExists("nome"))
-                            {
-                                Serial.print("Parametro 'nome' existe: ");
-                                Serial.println(request.getParam("nome"));
-                            }
-                            else
-                            {
-                                Serial.println("Parametro 'nome' não existe");
-                            }
-
-                            Serial.print("Todos cookies: ");
-                            Serial.println(request.getCookies());
-                            Serial.print("Cookie 'myCookie': ");
-                            Serial.println(request.getCookie("myCookie"));
-                            Serial.print("Header 'myHeader': ");
-                            Serial.println(myHeader);
-                        }
-                        else
-                        {
-                            client.println("HTTP/1.1 404 Not Found");
-                            client.println("Content-Type: text/plain");
-                            client.println("Connection: close");
-                            client.println();
-                            client.println("URL não encontrada");
-                        }
-                        break;
-                    }
-                    else if (request.metodoIs(MetodosHttp::POST))
-                    {
-                        Serial.println("metodo POST");
-                        Serial.print("URL: |");
-                        Serial.print(request.getUrl());
-                        Serial.println("|");
-
-                        if(request.urlIs("/ola"))
-                        {
-                        
-                            Serial.println("Endpoint '/ola' acessada");
-                            while (client.available())
-                            {
-                                char c = client.read();
-                                Serial.write(c);
-                            }
-                            
-                            client.println("HTTP/1.1 200 OK");
-                            client.println("Content-Type: text/plain");
-                            client.println("Connection: close");
-                            client.println();
-                            client.println("Olá, mundo!");
-                        }
-                        else
-                        {
-                            client.println("HTTP/1.1 404 Not Found");
-                            client.println("Content-Type: text/plain");
-                            client.println("Connection: close");
-                            client.println();
-                            client.println("URL não encontrada");
-                        }
-
-                        break;
-                    }
-                    else if (request.metodoIs(MetodosHttp::PUT))
-                    {
-                        Serial.println("metodo PUT");
-                        break;
-                    }
-                    else if (request.metodoIs(MetodosHttp::DELETE))
-                    {
-                        Serial.println("metodo DELETE");
-                        break;
-                    }
-                }
-
-                // Processa o cabeçalho HTTP
-                if (c == '\n')
-                {
-                    currentLine[currentLineIndex] = '\0'; // Termina a string
-
-                    Header headerAtual = request.analisarLinhaHttp(currentLine);
-                    if (headerAtual.chave != NULL)
-                    {
-                        if (strcmp(headerAtual.chave, "abacaxi") == 0)
-                        {
-                        strncpy(abacaxi, headerAtual.valor, sizeof(abacaxi));
-                        }
-                    }
-
-                    // verifica se o header
-
-                    currentLineIndex = 0;
-                }
-                else if (c != '\r')
-                {
-                    if (currentLineIndex < sizeof(currentLine) - 1)
-                    {
-                        currentLine[currentLineIndex++] = c;
-                    }
-                    else
-                    {
-                        Serial.println("Erro: Capacidade do array currentLine excedida!");
-                        currentLineIndex = 0; // Reinicia o índice para evitar erros futuros
-                    }
-                }
-            }
-        }
-
-        delay(1);
-        client.stop();
-        Serial.println("Cliente desconectado.");
-    }
+Serial.print("Is the URL '/test'? ");
+if(request.urlIs("/test")){
+    Serial.println("yes");
+}else{
+    Serial.println("no");
 }
+
+Serial.print("Be aware that the current URL is: ");
+Serial.println(request.getUrl());
+
+Serial.print("Host: ");
+Serial.println(request.getHost());
+
+Serial.print("User-Agent: ");
+Serial.println(request.getUserAgent());
+
+Serial.print("Authorization: ");
+Serial.println(request.getAuthorization());
+
+Serial.print("Content-Length: ");
+Serial.println(request.getContentLength());
+
+Serial.print("Content-Type: ");
+Serial.println(request.getContentType());
+
+Serial.print("List of all parameters: ");
+Serial.println(request.getParams());
+
+Serial.print("Does the 'name' parameter exist? ");
+if (request.paramExists("name"))
+{
+    Serial.println("yes");
+}
+else
+{
+    Serial.println("no");
+}
+
+Serial.print("The 'name' parameter has the value: ");
+Serial.println(request.getParam("nome"));
+
+Serial.print("List of all cookies: ");
+Serial.println(request.getCookies());
+Serial.print("The value of the Cookie 'myCookie' is: ");
+Serial.println(request.getCookie("myCookie"));
+Serial.print("Header 'myHeader': ");
+Serial.println(myHeader);
+Serial.print("Header 'dog': ");
+Serial.println(dog);
+
+// ...
+// ...
+// ...
+// ...
+// ...
+
 ```
 
-## Documentation
+## Limitations
 
-For detailed documentation and advanced usage, please refer to the [official documentation](https://github.com/yourusername/RequestsAndResponses/wiki).
+By default, some AnalyserRequest parameters have a maximum character limit. See below:
 
-## Contributing
+Parameter    | Maximum character length (bytes)
+------------ | ---     |
+Host + Params| 128     |
+Url          | 512     |
+Content-Type | 128     |
+User-Agent   | 128     |
+Authorization| 128     |
+Cookie       | 512     |
 
-We welcome contributions! Please read our [contributing guidelines](https://github.com/yourusername/RequestsAndResponses/blob/main/CONTRIBUTING.md) before submitting a pull request.
+Note that you can change these default values ​​to suit your needs by modifying the `RequestsAndResponses.h` file.
 
 ## License
 

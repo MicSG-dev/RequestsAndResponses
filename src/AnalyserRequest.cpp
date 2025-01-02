@@ -3,7 +3,7 @@
 AnalyserRequest::AnalyserRequest()
 {
     _contentLength = 0;
-    _haParametros = false;    
+    _haParametros = false;
     _numHeadersCustom = 0;
     _metodo = MetodosHttp::UNKNOWN;
 }
@@ -116,9 +116,21 @@ bool AnalyserRequest::metodoIs(MetodosHttp metodo)
     return _metodo == metodo;
 }
 
-MetodosHttp AnalyserRequest::getMetodo()
+const char *AnalyserRequest::getMetodo()
 {
-    return _metodo;
+    switch (_metodo)
+    {
+    case MetodosHttp::GET:
+        return "GET";
+    case MetodosHttp::POST:
+        return "POST";
+    case MetodosHttp::DELETE:
+        return "DELETE";
+    case MetodosHttp::PUT:
+        return "PUT";
+    default:
+        return "Unknown";
+    }
 }
 
 size_t AnalyserRequest::getContentLength()

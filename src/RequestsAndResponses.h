@@ -412,7 +412,7 @@ public:
     AnalyserRequest();
     Header analisarLinhaHttp(const char *linha);
 
-    MetodosHttp getMetodo();
+    const char * getMetodo();
     bool metodoIs(MetodosHttp metodo);
     const char *getUrl();
     bool urlIs(const char *url);
