@@ -37,10 +37,10 @@
 #include <EthernetLarge.h>
 #include "RequestsAndResponses.h"
 
-// Configurações da rede
-byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED}; // Endereço MAC fictício
-IPAddress ip(192, 168, 0, 177);                    // IP estático
-EthernetServer server(80);                         // Servidor na porta 80
+// Network settings
+byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED}; // Fictitious MAC address
+IPAddress ip(192, 168, 0, 177);                    // Static IP
+EthernetServer server(80);                         // Server on port 80
 
 void setup()
 {
@@ -49,7 +49,7 @@ void setup()
 
   while (!Serial)
   {
-    ; // Aguarda a inicialização da Serial
+    ; // Wait for Serial to initialize
   }
 
   Serial.println("Example RequestsAndResponses WebServer");
@@ -59,7 +59,7 @@ void setup()
   {
     Serial.println("Failed to configure Ethernet using DHCP");
     while (1)
-      ; // loop infinito
+      ; // infinite loop
   }
 
   Serial.print("Server started. IP: ");
