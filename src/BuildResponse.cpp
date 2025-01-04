@@ -17,12 +17,45 @@ void BuildResponse::addHeader(const char *chave, const char *valor)
     _client->print(": ");
     _client->println(valor);
 }
-
-void BuildResponse::send(const char *contentType, const char *message)
+void BuildResponse::send(const char *contentType, const char *message, bool newLine)
 {
-    _client->print("Content-Type: ");
-    _client->println(contentType);
-    _client->println("Connection: close");
-    _client->println();
-    _client->println(message);
+    if (!_alreadyClosed)
+    {
+        _client->print("Content-Type: ");
+        _client->println(contentType);
+        _client->println("Connection: close");
+        _client->println();
+        _alreadyClosed = true;
+    }
+
+    if (newLine)
+    {
+        _client->println(message);
+    }
+    else
+    {
+        _client->print(message);
+    }
+}
+
+void BuildResponse::send(const char *message, bool newLine)
+{
+
+    if (!_alreadyClosed)
+    {
+        _client->print("Content-Type: ");
+        _client->println(ContentType::TEXT_PLAIN);
+        _client->println("Connection: close");
+        _client->println();
+        _alreadyClosed = true;
+    }
+
+    if (newLine)
+    {
+        _client->println(message);
+    }
+    else
+    {
+        _client->print(message);
+    }
 }

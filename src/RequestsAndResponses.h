@@ -429,7 +429,7 @@ public:
     AnalyserRequest();
     Header analisarLinhaHttp(const char *linha);
 
-    const char * getMetodo();
+    const char *getMetodo();
     bool metodoIs(MetodosHttp metodo);
     const char *getUrl();
     bool urlIs(const char *url);
@@ -475,12 +475,13 @@ public:
     void begin(const char *code);
     void addHeader(const char *key, const char *value);
 
-    void send(const char *message);
-    void send(const char *contentType, const char *message);
+    void send(const char *message, bool newLine = true);
+    void send(const char *contentType, const char *message, bool newLine = true);
     void send(const char *contentType, const char *message, size_t length);
 
 private:
     Client *_client;
+    bool _alreadyClosed = false;
 };
 
 #endif // HTTPPARSER_H

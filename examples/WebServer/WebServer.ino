@@ -20,6 +20,10 @@
  * - EthernetLarge (https://github.com/MicSG-dev/EthernetLarge)
  * - RequestsAndResponses (https://github.com/MicSG-dev/RequestsAndResponses)
  * - SPI (Built-in)
+ * 
+ * Tips: 
+ * - For testing, use Postman to send HTTP requests to the server and check the responses.
+ * - You can download Postman from https://www.postman.com/downloads/.
  *
  * @author Michel Galvão
  * @see https://github.com/MicSG-dev
