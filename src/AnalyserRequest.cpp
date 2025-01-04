@@ -91,13 +91,34 @@ Header AnalyserRequest::analisarLinhaHttp(const char *linha)
     {
         // Verifica se é um header no formato "Chave: Valor"
         Header headerCustom;
-        headerCustom.chave = strtok((char *)linha, ":");
-        headerCustom.valor = strtok(NULL, ": ");
+        // Localiza a posição de ": " na string
+        char *pos = strstr(linha, ": ");
+        if (pos != NULL)
+        {
+            // Calcula o comprimento da parte antes de ": "
+            size_t chaveLen = pos - linha;
+            // Copia a parte antes de ": " para "chave"
+            strncpy(headerCustom.chave, linha, chaveLen);
+            headerCustom.chave[chaveLen] = '\0'; // Garante a terminação correta
+
+            // Avança a posição para depois de ": "
+            pos += 2;
+            // Copia o restante da string para "valor"
+            strncpy(headerCustom.valor, pos, sizeof(headerCustom.valor) - 1);
+            headerCustom.valor[sizeof(headerCustom.valor) - 1] = '\0'; // Garante a terminação correta
+        }
+        else
+        {
+            // Caso não encontre ": ", define "chave" e "valor" como vazio
+            headerCustom.chave[0] = '\0';
+            headerCustom.valor[0] = '\0';
+        }
+
         return headerCustom;
     }
     Header headerEmpty;
-    headerEmpty.chave = NULL;
-    headerEmpty.valor = NULL;
+    headerEmpty.chave[0] = '\0';
+    headerEmpty.valor[0] = '\0';
 
     return headerEmpty;
 }

@@ -111,14 +111,15 @@ Serial.println(dog);
 
 By default, some AnalyserRequest parameters have a maximum character limit. See below:
 
-Parameter    | Maximum character length (bytes)
------------- | ---     |
-Host + Params| 128     |
-Url          | 512     |
-Content-Type | 128     |
-User-Agent   | 128     |
-Authorization| 128     |
-Cookie       | 512     |
+Parameter                  | Maximum character length (bytes) | Example
+------------               | ---                              | ------------------- |
+Host                       | 128                              | ``arduino.local`` (has 13 characters)
+Url (including GET Params) | 512                              | ``/page1?led=high`` (has 15 characters)
+Content-Type               | 128                              | ``application/x-www-form-urlencoded`` (has 33 characters)
+User-Agent                 | 256                              | ``Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0`` (possui 125 caracteres)
+Authorization              | 256                              | ``Basic YWRtaW46ZXNwMzIgw6kgbGVnYWw=`` (has 34 characters)
+Cookie                     | 512                              | ``Cookie: Name=ESP32; Memory=4MB`` (has 30 characters)
+Others Headers             | 128 (Key) + 512 (Value)          | ``Fruit: Pineapple`` (has 5 characters [Key] + 9 characters [Value])
 
 Note that you can change these default values ​​to suit your needs by modifying the [`RequestsAndResponses.h`](https://github.com/MicSG-dev/RequestsAndResponses/blob/86c00fa5a755a7af7c25987d90a2f1600e2f19f3/src/RequestsAndResponses.h#L431-L440) file.
 

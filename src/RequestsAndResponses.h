@@ -63,14 +63,31 @@ struct Header
      *
      * This member represents the name of the HTTP header.
      */
-    const char *chave;
+    char chave[128];
 
     /**
      * @brief The value of the HTTP header.
      *
      * This member represents the value associated with the HTTP header.
      */
-    const char *valor;
+    char valor[512];
+};
+
+struct HeaderBig
+{
+    /**
+     * @brief The key of the HTTP header.
+     *
+     * This member represents the name of the HTTP header.
+     */
+    const char chave[512];
+
+    /**
+     * @brief The value of the HTTP header.
+     *
+     * This member represents the value associated with the HTTP header.
+     */
+    const char valor[512];
 };
 
 /**
@@ -422,10 +439,10 @@ public:
     const char *getParams();
     bool paramExists(const char *param);
     const char *getHost();
-    const char *getUserAgent();
     const char *getAuthorization();
     const char *getCookie(const char *cookie);
     const char *getCookies();
+    const char *getUserAgent();
 
 private:
     char _host[128] = "";
@@ -435,9 +452,9 @@ private:
     char _url[512];
     size_t _contentLength;
     char _contentType[128] = "";
-    char _userAgent[128] = "";
-    char _authorization[128] = "";
+    char _authorization[256] = "";
     char _cookie[512] = "";
+    char _userAgent[128] = "";
 
     char *_params;
     bool _haParametros;
