@@ -4,14 +4,14 @@
  *
  * This sketch implements a web server using the RequestsAndResponses library and EthernetLarge library.
  * It handles HTTP GET, POST, PUT and DELETE methods and demonstrates request parsing and response building.
- * 
+ *
  * Features:
  * - HTTP method handling (GET, POST, PUT, DELETE)
  * - URL routing (/test, /status-led endpoints)
  * - Request header parsing
  * - Parameter and cookie parsing
  * - Response building with status codes and headers
- * 
+ *
  * Hardware Requirements:
  * - ESP32 board
  * - Ethernet W5500 module (CS pin on GPIO5)
@@ -20,8 +20,8 @@
  * - EthernetLarge (https://github.com/MicSG-dev/EthernetLarge)
  * - RequestsAndResponses (https://github.com/MicSG-dev/RequestsAndResponses)
  * - SPI (Built-in)
- * 
- * Tips: 
+ *
+ * Tips:
  * - For testing, use Postman to send HTTP requests to the server and check the responses.
  * - You can download Postman from https://www.postman.com/downloads/.
  *
@@ -29,12 +29,11 @@
  * @see https://github.com/MicSG-dev
  * @see https://github.com/MicSG-dev/RequestsAndResponses
  * @contact contato@micsg.com.br
- * 
+ *
  * @date Created: 2025-01-03
  * @version 1.0.0
  * @copyright MIT License
  */
-
 
 #include "Arduino.h"
 #include <SPI.h>
@@ -99,7 +98,7 @@ void loop()
         // Detect end of HTTP header (empty line)
         if (c == '\n' && currentLineIndex == 0)
         {
-          if (request.metodoIs(MetodosHttp::GET)) // Check if the request method is GET
+          if (request.methodIs(MethodsHttp::GET)) // Check if the request method is GET
           {
             Serial.println("GET method!");
             Serial.print("URL: ");
@@ -116,7 +115,7 @@ void loop()
 
               // Build the response
               BuildResponse response(client);
-              response.begin(StatusCode::Successful::_202_ACCEPTED);          // Set the response status code
+              response.begin(StatusCode::Successful::_200_OK);                // Set the response status code
               response.addHeader("Test", "Test value");                       // Add a custom header
               response.send(ContentType::TEXT_PLAIN, "URL '/test' detected"); // Send the response with a content type and content
 
@@ -151,7 +150,7 @@ void loop()
             }
             break;
           }
-          else if (request.metodoIs(MetodosHttp::POST)) // Check if the request method is POST
+          else if (request.methodIs(MethodsHttp::POST)) // Check if the request method is POST
           {
             Serial.println("POST method!");
             Serial.print("URL: ");
@@ -174,7 +173,7 @@ void loop()
 
               // Build the response
               BuildResponse response(client);
-              response.begin(StatusCode::Successful::_202_ACCEPTED);                      // Set the response status code
+              response.begin(StatusCode::Successful::_200_OK);                            // Set the response status code
               response.send(ContentType::TEXT_PLAIN, "LED status changed successfully!"); // Send the response with a content type and content
             }
             else
@@ -187,28 +186,30 @@ void loop()
 
             break;
           }
-          else if (request.metodoIs(MetodosHttp::PUT))
+          else if (request.methodIs(MethodsHttp::PUT))
           {
             Serial.println("PUT method!");
             Serial.print("URL: ");
             Serial.println(request.getUrl());
 
             BuildResponse response(client);
-            response.begin(StatusCode::Successful::_202_ACCEPTED);
+            response.begin(StatusCode::Successful::_200_OK);
             response.send(ContentType::TEXT_PLAIN, "PUT method detected");
             break;
           }
-          else if (request.metodoIs(MetodosHttp::DELETE))
+          else if (request.methodIs(MethodsHttp::DELETE))
           {
             Serial.println("DELETE method!");
             Serial.print("URL: ");
             Serial.println(request.getUrl());
 
             BuildResponse response(client);
-            response.begin(StatusCode::Successful::_202_ACCEPTED);
+            response.begin(StatusCode::Successful::_200_OK);
             response.send(ContentType::TEXT_PLAIN, "DELETE method detected");
             break;
-          }else{
+          }
+          else
+          {
             Serial.println("Unknown method.");
             BuildResponse response(client);
             response.begin(StatusCode::ClientError::_405_METHOD_NOT_ALLOWED);
@@ -222,12 +223,12 @@ void loop()
         {
           currentLine[currentLineIndex] = '\0'; // Ends the string
 
-          Header headerAtual = request.analisarLinhaHttp(currentLine);
-          if (headerAtual.chave != NULL)
+          Header currentHeader = request.analyzeHttpLine(currentLine);
+          if (currentHeader.key != NULL)
           {
-            if (strcmp(headerAtual.chave, "Fruit") == 0)
+            if (strcmp(currentHeader.key, "Fruit") == 0)
             {
-              strncpy(fruit, headerAtual.valor, sizeof(fruit));
+              strncpy(fruit, currentHeader.value, sizeof(fruit));
             }
           }
 

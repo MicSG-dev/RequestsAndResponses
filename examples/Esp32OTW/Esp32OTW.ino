@@ -1,11 +1,11 @@
 /**
  * @file Esp32OTW.ino
  * @brief ESP32 Over-The-Wire (OTW) firmware update example using Ethernet
- * 
+ *
  * This sketch demonstrates a web server implementation on ESP32 that enables
- * firmware updates over Ethernet. It provides endpoints for version checking and 
+ * firmware updates over Ethernet. It provides endpoints for version checking and
  * firmware updates through HTTP requests.
- * 
+ *
  * Features:
  * - Web server on port 80 for handling HTTP requests
  * - GET /version - Returns current firmware version in JSON format
@@ -15,27 +15,27 @@
  * - Automatic restart after successful update
  * - Error handling and status reporting
  * - Serial debug output
- * 
+ *
  * Required Hardware:
  * - ESP32 board
  * - W5500 Ethernet module (CS pin on GPIO5)
- * 
+ *
  * Required Libraries:
  * - EthernetLarge (https://github.com/MicSG-dev/EthernetLarge)
  * - RequestsAndResponses (https://github.com/MicSG-dev/RequestsAndResponses)
  * - SPI (Built-in)
- * 
- * Tips: 
+ *
+ * Tips:
  * - For testing, use Postman to send HTTP requests to the server and check the responses.
  * - You can download Postman from https://www.postman.com/downloads/.
- * - To upload firmware with Postman, use the POST method and select "Body" -> "binary" 
+ * - To upload firmware with Postman, use the POST method and select "Body" -> "binary"
  *   and choose the compiled updated firmware. Then, upload the binary firmware file to the ESP32.
- * 
+ *
  * @author Michel Galvão
  * @see https://github.com/MicSG-dev
  * @see https://github.com/MicSG-dev/RequestsAndResponses
  * @contact contato@micsg.com.br
- * 
+ *
  * @date Created: 2025-01-04
  * @version 1.0.0
  * @copyright MIT License
@@ -52,7 +52,7 @@ byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED}; // Fictitious MAC address
 IPAddress ip(192, 168, 0, 177);                    // Static IP
 EthernetServer server(80);                         // Server on port 80
 
-const char *VERSION_FIRMWARE = "0.0.1"; // Defines the firmware version as a constant string.
+const char *VERSION_FIRMWARE = "0.0.2"; // Defines the firmware version as a constant string.
 
 bool shouldRestart = false;
 
@@ -118,7 +118,7 @@ void loop()
         // Detect end of HTTP header (empty line)
         if (c == '\n' && currentLineIndex == 0)
         {
-          if (request.metodoIs(MetodosHttp::GET)) // Check if the request method is GET
+          if (request.methodIs(MethodsHttp::GET)) // Check if the request method is GET
           {
             // Check if the URL is '/version'
             if (request.urlIs("/version"))
@@ -127,7 +127,7 @@ void loop()
 
               // Build the response
               BuildResponse response(client);
-              response.begin(StatusCode::Successful::_202_ACCEPTED);                  // Set the response status code
+              response.begin(StatusCode::Successful::_200_OK);                        // Set the response status code
               response.send(ContentType::APPLICATION_JSON, "{\"version\":\"", false); // Send the response as JSON, without sending line breaks (false argument)
               response.send(VERSION_FIRMWARE, false);                                 // Send the rest of the response without line breaks (false argument)
               response.send("\"}");                                                   // Send the rest of the response without line breaks (false argument)
@@ -141,7 +141,7 @@ void loop()
             }
             break;
           }
-          else if (request.metodoIs(MetodosHttp::POST)) // Check if the request method is POST
+          else if (request.methodIs(MethodsHttp::POST)) // Check if the request method is POST
           {
             if (request.urlIs("/otw"))
             {
@@ -196,7 +196,7 @@ void loop()
                   shouldRestart = true;
 
                   BuildResponse response(client);
-                  response.begin(StatusCode::Successful::_202_ACCEPTED);
+                  response.begin(StatusCode::Successful::_200_OK);
                   response.send(ContentType::TEXT_PLAIN, "OTW completed successfully! Scheduled for Restart");
                 }
                 else
@@ -243,12 +243,12 @@ void loop()
         {
           currentLine[currentLineIndex] = '\0'; // Ends the string
 
-          Header headerAtual = request.analisarLinhaHttp(currentLine);
-          if (headerAtual.chave != NULL)
+          Header currentHeader = request.analyzeHttpLine(currentLine);
+          if (currentHeader.key != NULL)
           {
-            if (strcmp(headerAtual.chave, "Fruit") == 0)
+            if (strcmp(currentHeader.key, "Fruit") == 0)
             {
-              strncpy(fruit, headerAtual.valor, sizeof(fruit));
+              strncpy(fruit, currentHeader.value, sizeof(fruit));
             }
           }
 

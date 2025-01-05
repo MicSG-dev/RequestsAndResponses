@@ -4,13 +4,13 @@
 #include <Arduino.h>
 
 /**
- * @enum MetodosHttp
+ * @enum MethodsHttp
  * @brief Represents HTTP methods.
  *
  * This enumeration defines the various HTTP methods that can be used in
  * HTTP requests. Each enumerator represents a specific HTTP method.
  */
-enum MetodosHttp
+enum MethodsHttp
 {
     /**
      * @brief Represents an unknown HTTP method.
@@ -63,14 +63,14 @@ struct Header
      *
      * This member represents the name of the HTTP header.
      */
-    char chave[128];
+    char key[128];
 
     /**
      * @brief The value of the HTTP header.
      *
      * This member represents the value associated with the HTTP header.
      */
-    char valor[512];
+    char value[512];
 };
 
 struct HeaderBig
@@ -158,6 +158,16 @@ namespace StatusCode
      */
     namespace Successful
     {
+        /**
+         * @brief HTTP status code for a successful request.
+         *
+         * This constant represents the "200 OK" status code, indicating that
+         * the request has succeeded. The meaning of the success depends on
+         * the request method: GET (resource obtained), HEAD (headers received),
+         * POST (resource created/updated), TRACE (message received).
+         */
+        const char _200_OK[] = "200 OK";
+
         /**
          * @brief HTTP status code for a resource that has been created.
          *
@@ -427,10 +437,10 @@ class AnalyserRequest
 {
 public:
     AnalyserRequest();
-    Header analisarLinhaHttp(const char *linha);
+    Header analyzeHttpLine(const char *line);
 
-    const char *getMetodo();
-    bool metodoIs(MetodosHttp metodo);
+    const char *getMethod();
+    bool methodIs(MethodsHttp method);
     const char *getUrl();
     bool urlIs(const char *url);
     size_t getContentLength();
@@ -447,7 +457,7 @@ public:
 private:
     char _host[128] = "";
     int _numHeadersCustom;
-    MetodosHttp _metodo;
+    MethodsHttp _method;
 
     char _url[512];
     size_t _contentLength;
@@ -457,7 +467,7 @@ private:
     char _userAgent[128] = "";
 
     char *_params;
-    bool _haParametros;
+    bool _haveParameters;
 };
 
 /**
@@ -477,7 +487,8 @@ public:
 
     void send(const char *message, bool newLine = true);
     void send(const char *contentType, const char *message, bool newLine = true);
-    void send(const char *contentType, const char *message, size_t length);
+    void send(const char *contentType,  const uint8_t *contentGzip, uint32_t size);
+    void send();
 
 private:
     Client *_client;

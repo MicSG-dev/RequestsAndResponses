@@ -11,11 +11,11 @@ void BuildResponse::begin(const char *code)
     _client->println(code);
 }
 
-void BuildResponse::addHeader(const char *chave, const char *valor)
+void BuildResponse::addHeader(const char *key, const char *value)
 {
-    _client->print(chave);
+    _client->print(key);
     _client->print(": ");
-    _client->println(valor);
+    _client->println(value);
 }
 void BuildResponse::send(const char *contentType, const char *message, bool newLine)
 {
@@ -57,5 +57,33 @@ void BuildResponse::send(const char *message, bool newLine)
     else
     {
         _client->print(message);
+    }
+}
+
+void BuildResponse::send(const char *contentType, const uint8_t *contentGzip, uint32_t size)
+{
+    if (!_alreadyClosed)
+    {
+        _client->print("Content-Type: ");
+        _client->println(contentType);
+        _client->println("Connection: close");
+        _client->println();
+        _alreadyClosed = true;
+    }
+
+    // Send the compressed data (the GZIP content)
+    for (uint32_t i = 0; i < size; i++)
+    {
+        _client->write(pgm_read_byte_near(&contentGzip[i]));
+    }
+}
+
+void BuildResponse::send()
+{
+    if (!_alreadyClosed)
+    {
+        _client->println("Connection: close");
+        _client->println();
+        _alreadyClosed = true;
     }
 }

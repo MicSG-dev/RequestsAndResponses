@@ -3,122 +3,150 @@
 AnalyserRequest::AnalyserRequest()
 {
     _contentLength = 0;
-    _haParametros = false;
+    _haveParameters = false;
     _numHeadersCustom = 0;
-    _metodo = MetodosHttp::UNKNOWN;
+    _method = MethodsHttp::UNKNOWN;
 }
 
-Header AnalyserRequest::analisarLinhaHttp(const char *linha)
+Header AnalyserRequest::analyzeHttpLine(const char *line)
 {
-    if (_metodo == MetodosHttp::UNKNOWN && strncmp(linha, "POST", 4) == 0)
+    if (_method == MethodsHttp::UNKNOWN && strncmp(line, "POST", 4) == 0)
     {
-        _metodo = MetodosHttp::POST;
+        _method = MethodsHttp::POST;
 
-        // Extrai a URL da requisição
-        char *urlInicio = strstr(linha, " ") + 1;
-        char *urlFim = strchr(urlInicio, ' ');
-        strncpy(_url, urlInicio, urlFim - urlInicio);
-        _url[urlFim - urlInicio] = '\0'; // Finaliza a string
-    }
-    else if (_metodo == MetodosHttp::UNKNOWN && strncmp(linha, "GET", 3) == 0)
-    {
-        _metodo = MetodosHttp::GET;
+        // Extract the URL from the request
+        char *urlStart = strstr(line, " ") + 1;
+        char *urlEnd = strchr(urlStart, ' ');
+        strncpy(_url, urlStart, urlEnd - urlStart);
+        _url[urlEnd - urlStart] = '\0'; // Finalize the string
 
-        // Extrai a URL da requisição
-        char *urlInicio = strstr(linha, " ") + 1;
-        char *urlFim = strchr(urlInicio, ' ');
-        strncpy(_url, urlInicio, urlFim - urlInicio);
-        _url[urlFim - urlInicio] = '\0'; // Finaliza a string
-
-        // Verifica se a URL contém parâmetros
-        char *paramsInicio = strchr(_url, '?');
-
-        if (paramsInicio != NULL)
+        // Remove the trailing slash if present
+        int len = strlen(_url);
+        if (len > 1 && _url[len - 1] == '/')
         {
-            // Separar a URL dos parâmetros
-            *paramsInicio = '\0'; // Termina a URL antes de '?'
-
-            // Extrai os parâmetros (após '?')
-            _params = paramsInicio + 1;
-            _haParametros = true;
+            _url[len - 1] = '\0';
         }
     }
-    else if (_metodo == MetodosHttp::UNKNOWN && strncmp(linha, "PUT", 3) == 0)
+    else if (_method == MethodsHttp::UNKNOWN && strncmp(line, "GET", 3) == 0)
     {
-        _metodo = MetodosHttp::PUT;
+        _method = MethodsHttp::GET;
 
-        // Extrai a URL da requisição
-        char *urlInicio = strstr(linha, " ") + 1;
-        char *urlFim = strchr(urlInicio, ' ');
-        strncpy(_url, urlInicio, urlFim - urlInicio);
-        _url[urlFim - urlInicio] = '\0'; // Finaliza a string
-    }
-    else if (_metodo == MetodosHttp::UNKNOWN && strncmp(linha, "DELETE", 6) == 0)
-    {
-        _metodo = MetodosHttp::DELETE;
+        // Extract the URL from the request
+        char *urlStart = strstr(line, " ") + 1;
+        char *urlEnd = strchr(urlStart, ' ');
+        strncpy(_url, urlStart, urlEnd - urlStart);
+        _url[urlEnd - urlStart] = '\0'; // Finalize the string
 
-        // Extrai a URL da requisição
-        char *urlInicio = strstr(linha, " ") + 1;
-        char *urlFim = strchr(urlInicio, ' ');
-        strncpy(_url, urlInicio, urlFim - urlInicio);
-        _url[urlFim - urlInicio] = '\0'; // Finaliza a string
+        // Remove the trailing slash if present
+        int len = strlen(_url);
+        if (len > 1 && _url[len - 1] == '/')
+        {
+            _url[len - 1] = '\0';
+        }
+
+        // Check if the URL contains parameters
+        char *paramsStart = strchr(_url, '?');
+
+        if (paramsStart != NULL)
+        {
+            // Separate the URL from the parameters
+            *paramsStart = '\0'; // End URL before '?'
+
+            // Extract the parameters (after '?')
+            _params = paramsStart + 1;
+            _haveParameters = true;
+        }
     }
-    else if (strncmp(linha, "Content-Length: ", 16) == 0)
+    else if (_method == MethodsHttp::UNKNOWN && strncmp(line, "PUT", 3) == 0)
     {
-        _contentLength = atoi(linha + 16);
+        _method = MethodsHttp::PUT;
+
+        // Extract the URL from the request
+        char *urlStart = strstr(line, " ") + 1;
+        char *urlEnd = strchr(urlStart, ' ');
+        strncpy(_url, urlStart, urlEnd - urlStart);
+        _url[urlEnd - urlStart] = '\0'; // Finalize the string
+
+        // Remove the trailing slash, if it exists
+        int len = strlen(_url);
+        if (len > 1 && _url[len - 1] == '/')
+        {
+            _url[len - 1] = '\0';
+        }
     }
-    else if (strncmp(linha, "Content-Type: ", 14) == 0)
+    else if (_method == MethodsHttp::UNKNOWN && strncmp(line, "DELETE", 6) == 0)
     {
-        strncpy(_contentType, linha + 14, sizeof(_contentType));
+        _method = MethodsHttp::DELETE;
+
+        // Extract the URL from the request
+        char *urlStart = strstr(line, " ") + 1;
+        char *urlEnd = strchr(urlStart, ' ');
+        strncpy(_url, urlStart, urlEnd - urlStart);
+        _url[urlEnd - urlStart] = '\0'; // Finalize the string
+
+        // Remove the trailing slash if exists
+        int len = strlen(_url);
+        if (len > 1 && _url[len - 1] == '/')
+        {
+            _url[len - 1] = '\0';
+        }
     }
-    else if (strncmp(linha, "Host: ", 6) == 0)
+    else if (strncmp(line, "Content-Length: ", 16) == 0)
     {
-        strncpy(_host, linha + 6, sizeof(_host));
+        _contentLength = atoi(line + 16);
     }
-    else if (strncmp(linha, "User-Agent: ", 12) == 0)
+    else if (strncmp(line, "Content-Type: ", 14) == 0)
     {
-        strncpy(_userAgent, linha + 12, sizeof(_userAgent));
+        strncpy(_contentType, line + 14, sizeof(_contentType));
     }
-    else if (strncmp(linha, "Authorization: ", 15) == 0)
+    else if (strncmp(line, "Host: ", 6) == 0)
     {
-        strncpy(_authorization, linha + 15, sizeof(_authorization));
+        strncpy(_host, line + 6, sizeof(_host));
     }
-    else if (strncmp(linha, "Cookie: ", 8) == 0)
+    else if (strncmp(line, "User-Agent: ", 12) == 0)
     {
-        strncpy(_cookie, linha + 8, sizeof(_cookie));
+        strncpy(_userAgent, line + 12, sizeof(_userAgent));
+    }
+    else if (strncmp(line, "Authorization: ", 15) == 0)
+    {
+        strncpy(_authorization, line + 15, sizeof(_authorization));
+    }
+    else if (strncmp(line, "Cookie: ", 8) == 0)
+    {
+        strncpy(_cookie, line + 8, sizeof(_cookie));
     }
     else
     {
-        // Verifica se é um header no formato "Chave: Valor"
+        
         Header headerCustom;
-        // Localiza a posição de ": " na string
-        char *pos = strstr(linha, ": ");
+        
+        char *pos = strstr(line, ": "); // Find the position of ": " in the string
         if (pos != NULL)
         {
-            // Calcula o comprimento da parte antes de ": "
-            size_t chaveLen = pos - linha;
-            // Copia a parte antes de ": " para "chave"
-            strncpy(headerCustom.chave, linha, chaveLen);
-            headerCustom.chave[chaveLen] = '\0'; // Garante a terminação correta
+            // Calculate the length of the part before ": "
+            size_t chaveLen = pos - line;
+            // Copy the part before ": " to "key"
+            strncpy(headerCustom.key, line, chaveLen);
+            headerCustom.key[chaveLen] = '\0'; // Ensures correct termination
 
-            // Avança a posição para depois de ": "
+            // Advance the position to after ": "
             pos += 2;
-            // Copia o restante da string para "valor"
-            strncpy(headerCustom.valor, pos, sizeof(headerCustom.valor) - 1);
-            headerCustom.valor[sizeof(headerCustom.valor) - 1] = '\0'; // Garante a terminação correta
+            // Copy the rest of the string to "value"
+            strncpy(headerCustom.value, pos, sizeof(headerCustom.value) - 1);
+            headerCustom.value[sizeof(headerCustom.value) - 1] = '\0'; // Ensures correct termination
         }
         else
         {
-            // Caso não encontre ": ", define "chave" e "valor" como vazio
-            headerCustom.chave[0] = '\0';
-            headerCustom.valor[0] = '\0';
+            // If ": " is not found, set "key" and "value" to empty
+            headerCustom.key[0] = '\0';
+            headerCustom.value[0] = '\0';
         }
 
         return headerCustom;
     }
     Header headerEmpty;
-    headerEmpty.chave[0] = '\0';
-    headerEmpty.valor[0] = '\0';
+    headerEmpty.key[0] = '\0';
+    headerEmpty.value[0] = '\0';
 
     return headerEmpty;
 }
@@ -132,22 +160,22 @@ bool AnalyserRequest::urlIs(const char *url)
     return strcmp(_url, url) == 0;
 }
 
-bool AnalyserRequest::metodoIs(MetodosHttp metodo)
+bool AnalyserRequest::methodIs(MethodsHttp method)
 {
-    return _metodo == metodo;
+    return _method == method;
 }
 
-const char *AnalyserRequest::getMetodo()
+const char *AnalyserRequest::getMethod()
 {
-    switch (_metodo)
+    switch (_method)
     {
-    case MetodosHttp::GET:
+    case MethodsHttp::GET:
         return "GET";
-    case MetodosHttp::POST:
+    case MethodsHttp::POST:
         return "POST";
-    case MetodosHttp::DELETE:
+    case MethodsHttp::DELETE:
         return "DELETE";
-    case MetodosHttp::PUT:
+    case MethodsHttp::PUT:
         return "PUT";
     default:
         return "Unknown";
@@ -161,7 +189,7 @@ size_t AnalyserRequest::getContentLength()
 
 const char *AnalyserRequest::getParams()
 {
-    if (!_haParametros)
+    if (!_haveParameters)
     {
         return "";
     }
@@ -170,23 +198,23 @@ const char *AnalyserRequest::getParams()
 
 const char *AnalyserRequest::getParam(const char *param)
 {
-    char *paramInicio = strstr(_params, param);
+    char *paramStart = strstr(_params, param);
 
-    if (paramInicio != NULL)
+    if (paramStart != NULL)
     {
-        paramInicio += strlen(param) + 1; // Pula o nome do parâmetro e o '='
-        char *paramFim = strchr(paramInicio, '&');
+        paramStart += strlen(param) + 1; // Skip the parameter name and the '='
+        char *paramEnd = strchr(paramStart, '&');
 
-        if (paramFim == NULL)
+        if (paramEnd == NULL)
         {
-            paramFim = _params + strlen(_params);
+            paramEnd = _params + strlen(_params);
         }
 
-        static char valor[256];
-        strncpy(valor, paramInicio, paramFim - paramInicio);
-        valor[paramFim - paramInicio] = '\0'; // Finaliza a string
+        static char value[256];
+        strncpy(value, paramStart, paramEnd - paramStart);
+        value[paramEnd - paramStart] = '\0'; // Finalize the string
 
-        return valor;
+        return value;
     }
 
     return NULL;
@@ -194,7 +222,7 @@ const char *AnalyserRequest::getParam(const char *param)
 
 bool AnalyserRequest::paramExists(const char *param)
 {
-    if (!_haParametros)
+    if (!_haveParameters)
     {
         return false;
     }
@@ -223,23 +251,23 @@ const char *AnalyserRequest::getAuthorization()
 
 const char *AnalyserRequest::getCookie(const char *cookie)
 {
-    char *cookieInicio = strstr(_cookie, cookie);
+    char *cookieStart = strstr(_cookie, cookie);
 
-    if (cookieInicio != NULL)
+    if (cookieStart != NULL)
     {
-        cookieInicio += strlen(cookie) + 1; // Pula o nome do cookie e o '='
-        char *cookieFim = strchr(cookieInicio, ';');
+        cookieStart += strlen(cookie) + 1; // Skip the cookie name and the '='
+        char *cookieEnd = strchr(cookieStart, ';');
 
-        if (cookieFim == NULL)
+        if (cookieEnd == NULL)
         {
-            cookieFim = _cookie + strlen(_cookie);
+            cookieEnd = _cookie + strlen(_cookie);
         }
 
-        static char valor[256];
-        strncpy(valor, cookieInicio, cookieFim - cookieInicio);
-        valor[cookieFim - cookieInicio] = '\0'; // Finaliza a string
+        static char value[256];
+        strncpy(value, cookieStart, cookieEnd - cookieStart);
+        value[cookieEnd - cookieStart] = '\0'; // Finalize the string
 
-        return valor;
+        return value;
     }
 
     return NULL;
