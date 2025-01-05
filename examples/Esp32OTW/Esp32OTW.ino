@@ -52,7 +52,7 @@ byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED}; // Fictitious MAC address
 IPAddress ip(192, 168, 0, 177);                    // Static IP
 EthernetServer server(80);                         // Server on port 80
 
-const char *VERSION_FIRMWARE = "0.0.2"; // Defines the firmware version as a constant string.
+const char *VERSION_FIRMWARE = "0.0.1"; // Defines the firmware version as a constant string.
 
 bool shouldRestart = false;
 
@@ -105,8 +105,6 @@ void loop()
     size_t currentLineIndex = 0; // Current line index
 
     AnalyserRequest request;
-
-    char fruit[50] = ""; // increase the array size as needed
 
     while (client.connected())
     {
@@ -243,14 +241,7 @@ void loop()
         {
           currentLine[currentLineIndex] = '\0'; // Ends the string
 
-          Header currentHeader = request.analyzeHttpLine(currentLine);
-          if (currentHeader.key != NULL)
-          {
-            if (strcmp(currentHeader.key, "Fruit") == 0)
-            {
-              strncpy(fruit, currentHeader.value, sizeof(fruit));
-            }
-          }
+          request.analyzeHttpLine(currentLine); // Use "Header currentHeader = request.analyzeHttpLine..." to get the current Header
 
           currentLineIndex = 0;
         }
