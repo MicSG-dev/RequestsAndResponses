@@ -36,7 +36,7 @@
 #include <SPI.h>
 #include <EthernetLarge.h>
 #include "RequestsAndResponses.h"
-#include "gzip.h"
+#include "gzip.h" // Use the software https://github.com/MicSG-dev/Script_export_files_web_gzip_decimal_arduino to convert files to gzip array
 
 // Network settings
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED}; // Fictitious MAC address
