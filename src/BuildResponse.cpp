@@ -87,3 +87,22 @@ void BuildResponse::send()
         _alreadyClosed = true;
     }
 }
+
+void BuildResponse::send(const char *contentType, const char *progmemContent, size_t size)
+{
+    if (!_alreadyClosed)
+    {
+        _client->print("Content-Type: ");
+        _client->println(contentType);
+        _client->println("Connection: close");
+        _client->println();
+        _alreadyClosed = true;
+    }
+
+    // Envia o conteúdo em PROGMEM com um loop for
+    for (size_t i = 0; i < size; i++)
+    {
+        char byteFromProgmem = pgm_read_byte_near(progmemContent + i);
+        _client->write(byteFromProgmem);
+    }
+}
