@@ -106,3 +106,34 @@ void BuildResponse::send(const char *contentType, const char *progmemContent, si
         _client->write(byteFromProgmem);
     }
 }
+
+void BuildResponse::send(const char *contentType, fs::FS &fs, const char *path)
+{
+    if (!_alreadyClosed)
+    {
+        _client->print("Content-Type: ");
+        _client->println(contentType);
+        _client->println("Connection: close");
+        _client->println();
+        _alreadyClosed = true;
+    }
+
+    File file = fs.open(path);
+    // Verifica se o ponteiro do arquivo é válido e o arquivo não é um diretório
+    if (!file || file.isDirectory())
+    {
+        _client->println("Error: Invalid file");
+        return;
+    }
+
+    // Envia o conteúdo do arquivo em partes
+    uint8_t buffer[512]; // Buffer para leitura do arquivo
+    size_t bytesRead;
+    while ((bytesRead = file.read(buffer, sizeof(buffer))) > 0)
+    {
+        _client->write(buffer, bytesRead);
+    }
+
+    // Fecha o arquivo após o envio
+    file.close();
+}
