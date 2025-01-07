@@ -7,7 +7,7 @@
  *
  * Features:
  * - HTTP GET method handling
- * - URL routing (/, /index.html, /assets/bootstrap/* endpoints) 
+ * - URL routing (/, /index.html, /assets/bootstrap/* endpoints)
  * - Client-side caching implementation
  * - Response building with status codes and cache headers
  * - Static file serving with caching
@@ -151,6 +151,23 @@ void loop()
                                                                                                          //  Used in conjunction with Cache-Control for older clients that don't support HTTP/1.1
                                                                                                          //
               response.send(ContentType::TEXT_JAVASCRIPT, BOOTSTRAP_MIN_JS, strlen_P(BOOTSTRAP_MIN_JS)); // Send the response with a content type and content
+            }
+            else if (request.urlIs("/assets/js/script.js"))
+            {
+              BuildResponse response(client);
+              response.begin(StatusCode::Successful::_200_OK);
+              response.addHeader("Cache-Control", "public, max-age=2592000, immutable");   // Set Cache-Control header to allow caching for ~30 days and mark response as immutable since static assets won't change
+              response.addHeader("ETag", VERSION_FIRMWARE);                                // Set ETag header using firmware version to enable client-side caching validation.
+              response.addHeader("Pragma", "cache");                                       // Set Pragma header to "cache" for HTTP/1.0 backwards compatibility
+                                                                                           //  Used in conjunction with Cache-Control for older clients that don't support HTTP/1.1
+                                                                                           //
+              response.send(ContentType::TEXT_JAVASCRIPT, SCRIPT_JS, strlen_P(SCRIPT_JS)); // Send the response with a content type and content
+            }
+            else if (request.urlIs("/version"))
+            {
+              BuildResponse response(client);
+              response.begin(StatusCode::Successful::_200_OK);          // Set the response status code
+              response.send(ContentType::TEXT_PLAIN, VERSION_FIRMWARE); // Send the response with a content type and content
             }
             else
             {

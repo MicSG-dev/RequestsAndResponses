@@ -7,12 +7,39 @@
 const char INDEX_HTML[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html data-bs-theme="light" lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Untitled</title>
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <title>ESP32 Ethernet Cache</title>
+    <script>
+window.addEventListener("load", () => {
+    const getFile = (url, callback) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.onload = () => { if (xhr.status == 200) callback(xhr.responseText); };
+        xhr.onerror = () => console.error('Error loading', url);
+        xhr.send();
+    };
+    getFile('/version', version => {
+        getFile(`assets/js/script.js?version=${version}`, jsText => {
+            const script = document.createElement('script');
+            script.textContent = jsText;
+            document.body.appendChild(script);
+            getFile(`assets/bootstrap/css/bootstrap.min.css?version=${version}`, cssText => {
+                const style = document.createElement('style');
+                style.textContent = cssText;
+                document.head.appendChild(style);
+                getFile(`assets/bootstrap/js/bootstrap.min.js?version=${version}`, bootstrapJsText => {
+                    const bootstrapScript = document.createElement('script');
+                    bootstrapScript.textContent = bootstrapJsText;
+                    document.body.appendChild(bootstrapScript);
+                    window.dispatchEvent(new CustomEvent('DownloadFilesReady'));
+                });
+            });
+        });
+    });
+});
+    </script>
 </head>
 
 <body>
@@ -24,10 +51,17 @@ const char INDEX_HTML[] PROGMEM = R"=====(
             </div>
         </div>
     </section>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 
 </html>
+)=====";
+
+const char SCRIPT_JS[] PROGMEM = R"=====(
+
+window.addEventListener("DownloadFilesReady", ()=>{ // custom event
+    console.log('All necessary files have been downloaded synchronously.');
+});
+
 )=====";
 
 const char BOOTSTRAP_MIN_JS[] PROGMEM = R"=====(
