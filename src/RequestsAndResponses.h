@@ -488,7 +488,7 @@ public:
 
     void send(const char *message, bool newLine = true);
     void send(const char *contentType, const char *message, bool newLine = true);
-    void send(const char *contentType, const uint8_t *contentGzip, uint32_t size);
+    void send(const char *contentType, const uint8_t *contentGzip, uint32_t size, std::function<void()> callback = nullptr);
     void send(const char *contentType, const char *progmemContent, size_t size);
     void send(const char *contentType, fs::FS &fs, const char *path);
     void send();

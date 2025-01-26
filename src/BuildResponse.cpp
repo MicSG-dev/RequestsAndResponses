@@ -60,7 +60,7 @@ void BuildResponse::send(const char *message, bool newLine)
     }
 }
 
-void BuildResponse::send(const char *contentType, const uint8_t *contentGzip, uint32_t size)
+void BuildResponse::send(const char *contentType, const uint8_t *contentGzip, uint32_t size, std::function<void()> callback)
 {
     if (!_alreadyClosed)
     {
@@ -74,6 +74,12 @@ void BuildResponse::send(const char *contentType, const uint8_t *contentGzip, ui
     // Send the compressed data (the GZIP content)
     for (uint32_t i = 0; i < size; i++)
     {
+        // Execute the callback function if it is provided
+        if (callback)
+        {
+            callback();
+        }
+        
         _client->write(pgm_read_byte_near(&contentGzip[i]));
     }
 }
